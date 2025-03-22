@@ -3,7 +3,7 @@ import pandas as pd
 
 INPUT_FOLDER = r"c:\Users\Hexecoder\Desktop\Omega Apps\input_excels"
 OUTPUT_FILE = r"c:\Users\Hexecoder\Desktop\Omega Apps\output.xlsx"
-TARGET_CELLS = ["A1", "A2"]
+TARGET_CELLS = ["C3", "C5"]  # Okunacak hücreler
 
 def read_excel_cells(file_path, target_cells):
     try:
@@ -20,11 +20,12 @@ def read_excel_cells(file_path, target_cells):
 
 def collect_data(input_folder, target_cells):
     data = []
-    for file_name in os.listdir(input_folder):
-        if file_name.endswith(".xlsx"):
-            file_path = os.path.join(input_folder, file_name)
-            cell_values = read_excel_cells(file_path, target_cells)
-            data.append([file_name] + cell_values)
+    for root, _, files in os.walk(input_folder):  # Alt dizinleri de tara
+        for file_name in files:
+            if file_name.endswith(".xlsx"):
+                file_path = os.path.join(root, file_name)
+                cell_values = read_excel_cells(file_path, target_cells)
+                data.append([file_name] + cell_values)
     return data
 
 def save_to_excel(output_file, data, headers):
