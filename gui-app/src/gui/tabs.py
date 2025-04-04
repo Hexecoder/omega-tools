@@ -7,6 +7,7 @@ class ExcelTab(QWidget):
         super().__init__()
         self.layout = QVBoxLayout()
 
+        # Excel dosyası seçimi
         self.label = QLabel("Select an Excel file:")
         self.layout.addWidget(self.label)
 
@@ -17,9 +18,16 @@ class ExcelTab(QWidget):
         self.file_path_label = QLabel("")
         self.layout.addWidget(self.file_path_label)
 
+        # Sheet seçimi
         self.sheet_dropdown = QComboBox()
         self.sheet_dropdown.setEnabled(False)  # Başlangıçta devre dışı
         self.layout.addWidget(self.sheet_dropdown)
+
+        # İşlemi Başlat Butonu
+        self.start_button = QPushButton("Start Process")
+        self.start_button.setEnabled(False)  # Başlangıçta devre dışı
+        self.start_button.clicked.connect(self.start_process)
+        self.layout.addWidget(self.start_button)
 
         self.setLayout(self.layout)
 
@@ -35,15 +43,26 @@ class ExcelTab(QWidget):
             self.sheet_dropdown.clear()
             self.sheet_dropdown.addItems(sheet_names)
             self.sheet_dropdown.setEnabled(True)  # Dropdown'u etkinleştir
+            self.start_button.setEnabled(True)  # İşlemi Başlat Butonunu etkinleştir
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred while loading sheets: {e}")
 
-    def process_file(self, file_path):
+    def start_process(self):
+        file_path = self.file_path_label.text()
+        if not file_path:
+            QMessageBox.warning(self, "Warning", "Please select an Excel file first.")
+            return
+
         try:
             selected_sheet = self.sheet_dropdown.currentText()  # Seçilen sheet ismini al
+            if not selected_sheet:
+                QMessageBox.warning(self, "Warning", "Please select a sheet first.")
+                return
+
             task_numbers = get_task_numbers(file_path, selected_sheet)  # Sheet ismini argüman olarak gönder
             for task_number in task_numbers:
                 url = f"http://example.com/task/{task_number}"
                 webbrowser.open(url)
+            QMessageBox.information(self, "Success", "Process completed successfully!")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
