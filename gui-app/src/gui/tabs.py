@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox, QComboBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox, QComboBox, QProgressBar
 import webbrowser
 import time
 from utils.excel_handler import get_task_numbers, get_sheet_names
@@ -30,6 +30,11 @@ class ExcelTab(QWidget):
         self.start_button.clicked.connect(self.start_process)
         self.layout.addWidget(self.start_button)
 
+        # Progress Bar
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setValue(0)  # Başlangıç değeri
+        self.layout.addWidget(self.progress_bar)
+
         self.setLayout(self.layout)
 
     def open_file_dialog(self):
@@ -55,16 +60,26 @@ class ExcelTab(QWidget):
             return
 
         try:
-            selected_sheet = self.sheet_dropdown.currentText()  # Seçilen sheet ismini al
+            selected_sheet = self.sheet_dropdown.currentText()
             if not selected_sheet:
                 QMessageBox.warning(self, "Warning", "Please select a sheet first.")
                 return
 
-            task_numbers = get_task_numbers(file_path, selected_sheet)  # Sheet ismini argüman olarak gönder
-            for task_number in task_numbers:
-                url = f"https://ipm.omegamuhendislik.com/Task/Record/{task_number}"
+            task_numbers = get_task_numbers(file_path, selected_sheet)
+            total_tasks = len(task_numbers)
+            if total_tasks == 0:
+                QMessageBox.warning(self, "Warning", "No tasks found in the selected sheet.")
+                return
+
+            self.progress_bar.setMaximum(total_tasks)  # Progress bar maksimum değerini ayarla
+            self.progress_bar.setValue(0)  # Başlangıç değeri
+
+            for index, task_number in enumerate(task_numbers, start=1):
+                url = f"https://ipm.omegamuhendislik.com.tr/Task/Record/{task_number}"
                 webbrowser.open(url)
-                time.sleep(2)
+                time.sleep(1)  # Bekleme süresi
+                self.progress_bar.setValue(index)  # İlerleme durumunu güncelle
+
             QMessageBox.information(self, "Success", "Process completed successfully!")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
