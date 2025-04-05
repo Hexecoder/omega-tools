@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QMessageBox, QComboBox
 import webbrowser
+import time
 from utils.excel_handler import get_task_numbers, get_sheet_names
 
 class ExcelTab(QWidget):
@@ -61,8 +62,9 @@ class ExcelTab(QWidget):
 
             task_numbers = get_task_numbers(file_path, selected_sheet)  # Sheet ismini argüman olarak gönder
             for task_number in task_numbers:
-                url = f"http://example.com/task/{task_number}"
+                url = f"https://ipm.omegamuhendislik.com/Task/Record/{task_number}"
                 webbrowser.open(url)
+                time.sleep(2)
             QMessageBox.information(self, "Success", "Process completed successfully!")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")

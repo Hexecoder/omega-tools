@@ -12,7 +12,7 @@ def get_task_numbers(file_path, sheet_name):
     """Belirtilen sheet'ten görev numaralarını alır."""
     try:
         df = pd.read_excel(file_path, sheet_name=sheet_name, engine="openpyxl")  # Motoru açıkça belirt engine="openpyxl")  # Motoru açıkça belirt
-        task_numbers = df['Task Number'].dropna().astype(str).tolist()  # 'Task Number' sütununu al
+        task_numbers = df['Görev No'].dropna().astype(str).tolist()  # 'Task Number' sütununu al
         return task_numbers
     except Exception as e:
         raise Exception(f"Failed to read task numbers: {e}")
