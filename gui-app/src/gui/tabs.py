@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDial
 import webbrowser
 import time
 from utils.excel_handler import get_task_numbers, get_sheet_names
+import subprocess  # subprocess modülünü ekleyin
+import sys
 
 class ExcelTab(QWidget):
     def __init__(self):
@@ -76,8 +78,14 @@ class ExcelTab(QWidget):
 
             for index, task_number in enumerate(task_numbers, start=1):
                 url = f"https://ipm.omegamuhendislik.com.tr/Task/Record/{task_number}"
-                webbrowser.open(url)
-                time.sleep(1)  # Bekleme süresi
+                
+                # Tarayıcıyı arka planda açmak için subprocess kullan
+                if sys.platform == "win32":  # Windows için
+                    subprocess.Popen(["start", "chrome", url], shell=True)
+                else:  # Diğer platformlar için (örneğin Linux veya macOS)
+                    subprocess.Popen(["open", url])
+
+                time.sleep(0.5)  # Bekleme süresi
                 self.progress_bar.setValue(index)  # İlerleme durumunu güncelle
 
             QMessageBox.information(self, "Success", "Process completed successfully!")
